@@ -1,47 +1,54 @@
-name: Build CiciWord APK & Web
-run-name: Build Android‑APK + Web for CiciWord
-
+name: Build CiciWord Web & Android APK
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
-
 jobs:
-  build:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 90
-    env:
-      FLET_NO_PROMPT: "1"
+  build-web:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Setup Python
+      - name: Prepare local template 0.28.3
+        run: git clone --depth=1 --branch 0.28.3 https://github.com/flet-dev/flet-build-template.git ./local_template
+      - name: Setup Python3.12
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Install python dependencies (PIN flet version 0.28.3)
+          python-version: "3.12"
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flet==0.28.3
-
-      - name: Build Android APK
-        run: |
-          flet build apk --no-upload --verbose
-
-      - name: Build Flet‑Web static site
-        run: |
-          flet build web --verbose
-
-      - name: Upload Android‑APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ciciword-apk
-          path: build/apk/*.apk
-
-      - name: Upload Web static files artifact
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build Web
+        run: flet build web --template ./local_template
+      - name: Upload Web artifact
         uses: actions/upload-artifact@v4
         with:
           name: ciciword-web
-          path: build/web/**
+          path: build/web
+
+  build-android-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Prepare local template 0.28.3
+        run: git clone --depth=1 --branch 0.28.3 https://github.com/flet-dev/flet-build-template.git ./local_template
+      - name: Setup Python3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet==0.28.3
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Build Android APK
+        run: flet build apk --template ./local_template
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ciciword-android-apk
+          path: build/apk
