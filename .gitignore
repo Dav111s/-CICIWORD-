@@ -1,0 +1,26 @@
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# pytorch训练权重【禁止上传pth！只保留onnx】
+*.pth
+
+# flet构建产物
+build/
+dist/
+*.spec
+
+# 本地sqlite数据库（vocab.db是本地用户库，不要提交）
+vocab.db
+
+# ide
+.idea/
+.vscode/
+
+# build log
+*.log
+*.json

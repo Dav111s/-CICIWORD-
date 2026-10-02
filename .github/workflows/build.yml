@@ -1,0 +1,46 @@
+name: Build CiciWord APK & Web
+run-name: Build Android‑APK + Web for CiciWord
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:    # 网页手动启动构建
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75   # 最大运行75分钟，避免任务永久卡死
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet
+
+      - name: Build Android APK
+        run: |
+          flet build apk --verbose
+
+      - name: Build Flet‑Web static site
+        run: |
+          flet build web --verbose
+
+      - name: Upload Android‑APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ciciword-apk
+          path: build/apk/*.apk
+
+      - name: Upload Web static files artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ciciword-web
+          path: build/web/**
