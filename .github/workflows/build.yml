@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Android APK
         run: |
-          flet build apk --no-upload --verbose
+          flet build apk --verbose
 
       - name: Build Flet‑Web static site
         run: |
