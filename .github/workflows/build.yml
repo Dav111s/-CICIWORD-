@@ -4,13 +4,14 @@ run-name: Build Android‑APK + Web for CiciWord
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:    # 网页手动启动构建
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-22.04
-    timeout-minutes: 75   # 最大运行75分钟，避免任务永久卡死
-
+    timeout-minutes: 90
+    env:
+      FLET_NO_PROMPT: "1"
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -23,11 +24,11 @@ jobs:
       - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet
+          pip install flet flet-android
 
       - name: Build Android APK
         run: |
-          flet build apk --verbose
+          flet build apk --no-upload --verbose
 
       - name: Build Flet‑Web static site
         run: |
