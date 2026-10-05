@@ -806,3 +806,21 @@ def should_train() -> bool:
     训练时优先用 feat_snapshot（有值时），否则回退当前特征近似并继续降权。
     这样彻底消除时间泄露。
 """
+
+
+import os
+import flet as ft
+
+def get_model_onnx_path():
+    # PC本地开发路径
+    local_path = os.path.join("ai", "memory_model.onnx")
+    # Android：构建脚本会把整个ai目录拷贝进assets资源
+    asset_path = ft.app.get_asset_path("ai/memory_model.onnx")
+
+    #优先判断平台
+    if asset_path is not None and os.path.exists(asset_path):
+        return asset_path
+    if os.path.exists(local_path):
+        return local_path
+    raise FileNotFoundError("ONNX模型文件缺失！")
+
