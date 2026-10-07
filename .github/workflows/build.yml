@@ -1,17 +1,19 @@
-name: Build CiciWord APK & Web
+name: Build CiciWord Web & Android APK
 run-name: Build Android‑APK + Web for CiciWord
+
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+env:
+  FLET_NO_PROMPT: "1"
+
 jobs:
-  build:
+  build-web:
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
-    env:
-      FLET_NO_PROMPT: "1"
     steps:
-      - name: Checkout source code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -19,30 +21,44 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install python dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install flet==0.28.3 flet-android
-
-      - name: CI‑only temporary copy ai folder into assets (local repo structure unchanged!)
-        run: cp -r ./ai ./assets/
-
-      - name: Build Android APK
-        run: |
-          flet build apk --no-upload --verbose
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Build Flet‑Web static site
-        run: |
-          flet build web --verbose
-
-      - name: Upload Android‑APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ciciword-apk
-          path: build/apk/*.apk
+        run: flet build web --verbose
 
       - name: Upload Web static files artifact
         uses: actions/upload-artifact@v4
         with:
           name: ciciword-web
           path: build/web/**
+
+  build-android-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet==0.28.3 flet-android
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Build Android APK
+        run: flet build apk --no-upload --verbose
+
+      - name: Upload Android‑APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ciciword-android-apk
+          path: build/apk/*.apk

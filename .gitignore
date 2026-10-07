@@ -14,6 +14,10 @@ build/
 dist/
 *.spec
 
+# flet本地缓存
+.flet/
+_template_cache/
+
 # 本地sqlite数据库（vocab.db是本地用户库，不要提交）
 vocab.db
 
@@ -21,6 +25,19 @@ vocab.db
 .idea/
 .vscode/
 
-# build log
+# 本地打包调试临时文件日志
 *.log
-*.json
+_apk_build*.log
+_get_*.py
+_flutter_ver.log
+_sdk_install*.log
+gradle.properties
+
+#运行时生成文件
+batch_state.json
+summary_state.json
+*.tmp
+
+#测试文档
+test/
+z_docs/
